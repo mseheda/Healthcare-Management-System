@@ -11,15 +11,18 @@ public class DoctorsController : ControllerBase
 {
     private readonly IDoctorService _doctorService;
     private readonly Logger _logger;
+    private readonly INotificationService _notificationService;
 
-    public DoctorsController(IDoctorService doctorService, Logger logger)
+    public DoctorsController(IDoctorService doctorService, Logger logger, INotificationService notificationService)
     {
         _doctorService = doctorService;
         _logger = logger;
+        _notificationService = notificationService;
 
         if (_doctorService is DoctorService service)
         {
             service.Logger = logger;
+            service.Logger.Log("DoctorService instance created.");
         }
     }
 
@@ -28,7 +31,7 @@ public class DoctorsController : ControllerBase
     {
         try
         {
-            _doctorService.AddDoctor(doctor, _logger);
+            _doctorService.AddDoctor(doctor, (NotificationService)_notificationService);
             return Ok();
         }
         catch (ObjectDisposedException)

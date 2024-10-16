@@ -16,7 +16,7 @@ public class DoctorService : IDoctorService
         _doctors = new List<Doctor>();
     }
 
-    public void AddDoctor(Doctor doctor, Logger logger)
+    public void AddDoctor(Doctor doctor, NotificationService? notificationService)
     {
         string message;
 
@@ -38,6 +38,8 @@ public class DoctorService : IDoctorService
         TotalDoctorsAdded++;
         message = $"Doctor {doctor.Name} added.";
         Logger?.Log(message);
+
+        notificationService?.SendNotification($"Doctor {doctor.Name} has been successfully added.");
     }
 
     public List<Doctor> GetDoctors()

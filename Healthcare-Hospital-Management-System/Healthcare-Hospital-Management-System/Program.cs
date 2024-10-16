@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
-
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<Logger>();
 
 builder.Services.AddControllers();
