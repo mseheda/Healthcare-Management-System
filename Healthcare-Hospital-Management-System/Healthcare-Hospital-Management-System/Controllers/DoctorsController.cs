@@ -16,6 +16,11 @@ public class DoctorsController : ControllerBase
     {
         _doctorService = doctorService;
         _logger = logger;
+
+        if (_doctorService is DoctorService service)
+        {
+            service.Logger = logger;
+        }
     }
 
     [HttpPost]

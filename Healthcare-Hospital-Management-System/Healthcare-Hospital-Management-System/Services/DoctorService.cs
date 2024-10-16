@@ -1,41 +1,43 @@
 using HealthcareHospitalManagementSystem.Models;
 using HealthcareHospitalManagementSystem.Services;
 using HealthcareHospitalManagementSystem.Infrastructure;
+using System;
+using System.Collections.Generic;
 
 public class DoctorService : IDoctorService
 {
     private List<Doctor> _doctors;
-    private readonly Logger _logger;
     private const int MaxDoctors = 50;
     public static int TotalDoctorsAdded { get; private set; } = 0;
+    public Logger Logger { get; set; }
 
-    public DoctorService(Logger logger)
+    public DoctorService()
     {
         _doctors = new List<Doctor>();
-        _logger = logger;
     }
 
     public void AddDoctor(Doctor doctor, Logger logger)
     {
         string message;
+
         if (_doctors.Count >= MaxDoctors)
         {
             message = $"Cannot add doctor {doctor.Name}. Maximum number of doctors reached.";
-            logger.LogError(message);
+            Logger?.LogError(message);
             throw new InvalidOperationException(message);
         }
 
         if (!ValidateDoctor(doctor))
         {
             message = $"Cannot add doctor {doctor.Name}. Invalid doctor details.";
-            logger.LogError(message);
+            Logger?.LogError(message);
             throw new InvalidOperationException(message);
         }
 
-        message = $"Doctor {doctor.Name} added.";
         _doctors.Add(doctor);
         TotalDoctorsAdded++;
-        logger.Log(message);
+        message = $"Doctor {doctor.Name} added.";
+        Logger?.Log(message);
     }
 
     public List<Doctor> GetDoctors()
