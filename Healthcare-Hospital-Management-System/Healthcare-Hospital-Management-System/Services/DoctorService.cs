@@ -15,27 +15,27 @@ public class DoctorService : IDoctorService
         _logger = logger;
     }
 
-    public void AddDoctor(Doctor doctor)
+    public void AddDoctor(Doctor doctor, Logger logger)
     {
         string message;
         if (_doctors.Count >= MaxDoctors)
         {
             message = $"Cannot add doctor {doctor.Name}. Maximum number of doctors reached.";
-            _logger.LogError(message);
+            logger.LogError(message);
             throw new InvalidOperationException(message);
         }
 
         if (!ValidateDoctor(doctor))
         {
-            message = $"Cannot add doctor {doctor.Name}. Invalid doctor information.";
-            _logger.LogError(message);
+            message = $"Cannot add doctor {doctor.Name}. Invalid doctor details.";
+            logger.LogError(message);
             throw new InvalidOperationException(message);
         }
 
+        message = $"Doctor {doctor.Name} added.";
         _doctors.Add(doctor);
         TotalDoctorsAdded++;
-        message = $"Doctor {doctor.Name} added";
-        _logger.Log(message);
+        logger.Log(message);
     }
 
     public List<Doctor> GetDoctors()

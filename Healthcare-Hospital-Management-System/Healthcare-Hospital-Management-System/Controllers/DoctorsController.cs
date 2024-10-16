@@ -23,7 +23,7 @@ public class DoctorsController : ControllerBase
     {
         try
         {
-            _doctorService.AddDoctor(doctor);
+            _doctorService.AddDoctor(doctor, _logger);
             return Ok();
         }
         catch (ObjectDisposedException)
