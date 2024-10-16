@@ -19,7 +19,7 @@ namespace HealthcareHospitalManagementSystem.Models
         {
             if (obj is Doctor other)
             {
-                return base.Equals(other) && 
+                return base.Equals(other) &&
                        this.Specialization == other.Specialization &&
                        this.Department == other.Department;
             }
