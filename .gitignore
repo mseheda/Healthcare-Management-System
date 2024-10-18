@@ -224,4 +224,8 @@ AppPackages/
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)
 #####
+# Ignore PNG and TXT files
+*.png
+*.txt
+
 Healthcare-Hospital-Management-System/Healthcare-Hospital-Management-System/notifications.txt
