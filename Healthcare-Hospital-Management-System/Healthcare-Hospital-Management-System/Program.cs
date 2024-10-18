@@ -7,7 +7,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
-builder.Services.AddScoped<Logger>();
+builder.Services.AddScoped<ICustomLogger, Logger>();
 
 builder.Services.AddControllers();
 

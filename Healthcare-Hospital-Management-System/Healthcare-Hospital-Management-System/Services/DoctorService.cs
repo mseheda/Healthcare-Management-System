@@ -1,8 +1,6 @@
+using HealthcareHospitalManagementSystem.Infrastructure;
 using HealthcareHospitalManagementSystem.Models;
 using HealthcareHospitalManagementSystem.Services;
-using HealthcareHospitalManagementSystem.Infrastructure;
-using System;
-using System.Collections.Generic;
 
 public class DoctorService : IDoctorService
 {
