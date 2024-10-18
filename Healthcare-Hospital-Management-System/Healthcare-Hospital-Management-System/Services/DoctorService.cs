@@ -4,12 +4,12 @@ using HealthcareHospitalManagementSystem.Services;
 
 public class DoctorService : IDoctorService
 {
-    private List<Doctor> _doctors;
+    private static List<Doctor> _doctors;
     private const int MaxDoctors = 50;
     public static int TotalDoctorsAdded { get; private set; } = 0;
     public Logger Logger { get; set; }
 
-    public DoctorService()
+    static DoctorService()
     {
         _doctors = new List<Doctor>();
     }

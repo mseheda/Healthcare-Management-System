@@ -25,10 +25,21 @@ public class DoctorsController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult AddDoctor(Doctor doctor)
+    public ActionResult AddDoctor([FromQuery] string name = "John Doe",
+                                  [FromQuery] int age = 45,
+                                  [FromQuery] string specialization = "General Medicine",
+                                  [FromQuery] string department = "Internal Medicine")
     {
         try
         {
+            var doctor = new Doctor
+            {
+                Name = name,
+                Age = age,
+                Specialization = specialization,
+                Department = department
+            };
+
             _doctorService.AddDoctor(doctor, (NotificationService)_notificationService);
             return Ok();
         }
@@ -41,6 +52,7 @@ public class DoctorsController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+
 
     [HttpGet]
     public ActionResult<List<Doctor>> GetDoctors()
