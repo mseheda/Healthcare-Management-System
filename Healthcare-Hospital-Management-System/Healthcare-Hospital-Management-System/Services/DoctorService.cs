@@ -34,10 +34,10 @@ public class DoctorService : IDoctorService
 
         _doctors.Add(doctor);
         TotalDoctorsAdded++;
-        message = $"Doctor {doctor.Name} added.";
+        message = $"Doctor {doctor.Name} has been successfully added.";
         Logger?.Log(message);
 
-        notificationService?.SendNotification($"Doctor {doctor.Name} has been successfully added.");
+        notificationService?.SendNotificationAsync(message, CancellationToken.None);
     }
 
     public List<Doctor> GetDoctors()
