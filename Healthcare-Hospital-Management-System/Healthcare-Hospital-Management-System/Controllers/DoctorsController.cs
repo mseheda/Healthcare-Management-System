@@ -1,52 +1,67 @@
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
 using HealthcareHospitalManagementSystem.Models;
 using HealthcareHospitalManagementSystem.Services;
+using HealthcareHospitalManagementSystem.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace HealthcareHospitalManagementSystem.Controllers
+[ApiController]
+[Route("api/[controller]")]
+public class DoctorsController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class DoctorsController : ControllerBase
+    private readonly IDoctorService _doctorService;
+    private readonly Logger _logger;
+    private readonly INotificationService _notificationService;
+
+    public DoctorsController(IDoctorService doctorService, Logger logger, INotificationService notificationService)
     {
-        private readonly IDoctorService _doctorService;
+        _doctorService = doctorService;
+        _logger = logger;
+        _notificationService = notificationService;
 
-        public DoctorsController(IDoctorService doctorService)
+        if (_doctorService is DoctorService service)
         {
-            _doctorService = doctorService;
+            service.Logger = logger;
+            service.Logger.Log("DoctorService instance created.");
         }
+    }
 
-        [HttpGet]
-        public ActionResult<List<Doctor>> GetAllDoctors()
+    [HttpPost]
+    public ActionResult AddDoctor(Doctor doctor)
+    {
+        try
         {
-            return _doctorService.GetAllDoctors();
-        }
-
-        [HttpPost]
-        public ActionResult AddDoctor(Doctor doctor)
-        {
-            _doctorService.AddDoctor(doctor);
-            
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), $"{DateTime.UtcNow.Ticks}_transaction.log");
-            DoctorService service = new DoctorService(filePath);
-
-            try
-            {
-                service.LogTransaction($"Doctor {doctor.Name} added");
-            }
-            catch (ObjectDisposedException)
-            {
-                return StatusCode(500, "Error logging transaction");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-            finally
-            {
-                service.Dispose();
-            }
+            _doctorService.AddDoctor(doctor, (NotificationService)_notificationService);
             return Ok();
+        }
+        catch (ObjectDisposedException)
+        {
+            return StatusCode(500, "Error logging transaction");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    [HttpGet]
+    public ActionResult<List<Doctor>> GetDoctors()
+    {
+        try
+        {
+            var doctors = _doctorService.GetDoctors();
+            if (!doctors.Any())
+                return NotFound("No doctors found");
+
+            return Ok(doctors);
+        }
+        catch (ObjectDisposedException)
+        {
+            return StatusCode(500, "Service is disposed");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message);
         }
     }
 }

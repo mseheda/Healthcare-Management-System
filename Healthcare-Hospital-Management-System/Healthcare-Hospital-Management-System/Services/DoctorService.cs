@@ -1,66 +1,54 @@
-using System.Collections.Generic;
 using HealthcareHospitalManagementSystem.Models;
+using HealthcareHospitalManagementSystem.Services;
+using HealthcareHospitalManagementSystem.Infrastructure;
+using System;
+using System.Collections.Generic;
 
-namespace HealthcareHospitalManagementSystem.Services
+public class DoctorService : IDoctorService
 {
-    public class DoctorService : IDisposable, IDoctorService
+    private List<Doctor> _doctors;
+    private const int MaxDoctors = 50;
+    public static int TotalDoctorsAdded { get; private set; } = 0;
+    public Logger Logger { get; set; }
+
+    public DoctorService()
     {
-        private readonly List<Doctor> _doctors = new List<Doctor>();
-        private readonly FileStream _transactionLogFileStream;
-        private bool _disposed = false;
+        _doctors = new List<Doctor>();
+    }
 
-        public DoctorService()
-        {
-            
-        }
-        
-        public DoctorService(string filePath)
-        {
-            _transactionLogFileStream = new FileStream(filePath, FileMode.OpenOrCreate);
-        }
+    public void AddDoctor(Doctor doctor, NotificationService? notificationService)
+    {
+        string message;
 
-        public void LogTransaction(string message)
+        if (_doctors.Count >= MaxDoctors)
         {
-            if (_disposed)
-                throw new ObjectDisposedException("DoctorService");
-            
-            byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes($"DateTime: {DateTime.UtcNow}, Message: {message}\n");
-            _transactionLogFileStream.Write(messageBytes, 0, messageBytes.Length);
-        }
-        
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-                {
-                    _transactionLogFileStream.Dispose();
-                }
-            _disposed = true;
-        }
-        
-        ~DoctorService()
-        {
-            Dispose(false);
-        }
-            
-        public List<Doctor> GetAllDoctors()
-        {
-            return _doctors;
+            message = $"Cannot add doctor {doctor.Name}. Maximum number of doctors reached.";
+            Logger?.LogError(message);
+            throw new InvalidOperationException(message);
         }
 
-        public void AddDoctor(Doctor doctor)
+        if (!ValidateDoctor(doctor))
         {
-            _doctors.Add(doctor);
+            message = $"Cannot add doctor {doctor.Name}. Invalid doctor details.";
+            Logger?.LogError(message);
+            throw new InvalidOperationException(message);
         }
+
+        _doctors.Add(doctor);
+        TotalDoctorsAdded++;
+        message = $"Doctor {doctor.Name} added.";
+        Logger?.Log(message);
+
+        notificationService?.SendNotification($"Doctor {doctor.Name} has been successfully added.");
+    }
+
+    public List<Doctor> GetDoctors()
+    {
+        return _doctors;
+    }
+
+    public static bool ValidateDoctor(Doctor doctor)
+    {
+        return !string.IsNullOrWhiteSpace(doctor.Name) && !string.IsNullOrWhiteSpace(doctor.Specialization);
     }
 }
