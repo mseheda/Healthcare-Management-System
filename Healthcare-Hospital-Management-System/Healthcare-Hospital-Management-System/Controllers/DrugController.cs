@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using HealthcareHospitalManagementSystem.Services;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HealthcareHospitalManagementSystem.Controllers
 {
@@ -26,6 +28,33 @@ namespace HealthcareHospitalManagementSystem.Controllers
         {
             var result = await _drugClient.GetDrugReportAsStructAsync(term, cancellationToken);
             return Ok(result);
+        }
+
+        [HttpGet("getSummary")]
+        public async Task<IActionResult> GetSummary(string term, CancellationToken cancellationToken)
+        {
+            var report = await _drugClient.GetDrugReportAsClassAsync(term, cancellationToken);
+
+            var summary = report.GetSummary();
+            return Ok(summary);
+        }
+
+        [HttpGet("getDetailedSummary")]
+        public async Task<IActionResult> GetDetailedSummary(string term, bool detailed, CancellationToken cancellationToken)
+        {
+            var report = await _drugClient.GetDrugReportAsClassAsync(term, cancellationToken);
+
+            var summary = report.GetSummary(detailed);
+            return Ok(summary);
+        }
+
+        [HttpGet("getSummaryForYear")]
+        public async Task<IActionResult> GetSummaryForYear(string term, int year, CancellationToken cancellationToken)
+        {
+            var report = await _drugClient.GetDrugReportAsClassAsync(term, cancellationToken);
+
+            var summary = report.GetSummary(year);
+            return Ok(summary);
         }
     }
 }
