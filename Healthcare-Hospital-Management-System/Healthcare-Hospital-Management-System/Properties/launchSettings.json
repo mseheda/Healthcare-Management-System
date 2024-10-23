@@ -16,7 +16,8 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5130",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "OPENFDA_API_KEY": "zFdVTKJ31smmPSYVy7aIhsrxub0yWy6hdCY4xPgm"
       }
     },
     "https": {

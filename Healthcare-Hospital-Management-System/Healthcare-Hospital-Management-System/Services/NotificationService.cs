@@ -2,13 +2,15 @@
 {
     public class NotificationService : INotificationService
     {
-        public void SendNotification(string message)
+        public async Task SendNotificationAsync(string message, CancellationToken cancellationToken)
         {
-            string filePath = "notifications.txt";
+            string filePath = "transactions.log";
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            string formattedMessage = $"{timestamp}: {message}";
 
             using (StreamWriter writer = new StreamWriter(filePath, true))
             {
-                writer.WriteLine($"Notification: {message}");
+                await writer.WriteLineAsync(formattedMessage.AsMemory(), cancellationToken);
             }
         }
     }

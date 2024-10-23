@@ -1,17 +1,15 @@
+using HealthcareHospitalManagementSystem.Infrastructure;
 using HealthcareHospitalManagementSystem.Models;
 using HealthcareHospitalManagementSystem.Services;
-using HealthcareHospitalManagementSystem.Infrastructure;
-using System;
-using System.Collections.Generic;
 
 public class DoctorService : IDoctorService
 {
-    private List<Doctor> _doctors;
+    private static List<Doctor> _doctors;
     private const int MaxDoctors = 50;
     public static int TotalDoctorsAdded { get; private set; } = 0;
     public Logger Logger { get; set; }
 
-    public DoctorService()
+    static DoctorService()
     {
         _doctors = new List<Doctor>();
     }
@@ -36,10 +34,10 @@ public class DoctorService : IDoctorService
 
         _doctors.Add(doctor);
         TotalDoctorsAdded++;
-        message = $"Doctor {doctor.Name} added.";
+        message = $"Doctor {doctor.Name} has been successfully added.";
         Logger?.Log(message);
 
-        notificationService?.SendNotification($"Doctor {doctor.Name} has been successfully added.");
+        notificationService?.SendNotificationAsync(message, CancellationToken.None);
     }
 
     public List<Doctor> GetDoctors()

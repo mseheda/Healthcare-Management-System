@@ -1,8 +1,6 @@
-using Microsoft.Extensions.Logging;
-
 namespace HealthcareHospitalManagementSystem.Infrastructure
 {
-    public class Logger
+    public class Logger : ICustomLogger
     {
         private readonly ILogger<Logger> _logger;
 

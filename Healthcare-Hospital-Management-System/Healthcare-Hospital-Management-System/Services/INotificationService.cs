@@ -2,7 +2,7 @@
 {
     public interface INotificationService
     {
-        void SendNotification(string message);
+        Task SendNotificationAsync(string message, CancellationToken cancellationToken);
     }
 
 }
