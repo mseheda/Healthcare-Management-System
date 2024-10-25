@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using HealthcareHospitalManagementSystem.Services;
 using HealthcareHospitalManagementSystem.Models;
 
 namespace HealthcareHospitalManagementSystem.Services

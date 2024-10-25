@@ -1,19 +1,17 @@
+using HealthcareHospitalManagementSystem.Infrastructure;
 using HealthcareHospitalManagementSystem.Models;
 using HealthcareHospitalManagementSystem.Services;
-using HealthcareHospitalManagementSystem.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
 
 [ApiController]
 [Route("api/[controller]")]
 public class DoctorsController : ControllerBase
 {
     private readonly IDoctorService _doctorService;
-    private readonly Logger _logger;
+    private readonly ICustomLogger _logger;
     private readonly INotificationService _notificationService;
 
-    public DoctorsController(IDoctorService doctorService, Logger logger, INotificationService notificationService)
+    public DoctorsController(IDoctorService doctorService, ICustomLogger logger, INotificationService notificationService)
     {
         _doctorService = doctorService;
         _logger = logger;
@@ -21,16 +19,27 @@ public class DoctorsController : ControllerBase
 
         if (_doctorService is DoctorService service)
         {
-            service.Logger = logger;
+            service.Logger = (Logger)logger;
             service.Logger.Log("DoctorService instance created.");
         }
     }
 
     [HttpPost]
-    public ActionResult AddDoctor(Doctor doctor)
+    public ActionResult AddDoctor([FromQuery] string name = "John Doe",
+                                  [FromQuery] int age = 45,
+                                  [FromQuery] string specialization = "General Medicine",
+                                  [FromQuery] string department = "Internal Medicine")
     {
         try
         {
+            var doctor = new Doctor
+            {
+                Name = name,
+                Age = age,
+                Specialization = specialization,
+                Department = department
+            };
+
             _doctorService.AddDoctor(doctor, (NotificationService)_notificationService);
             return Ok();
         }
@@ -43,6 +52,7 @@ public class DoctorsController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
+
 
     [HttpGet]
     public ActionResult<List<Doctor>> GetDoctors()
