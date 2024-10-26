@@ -1,25 +1,38 @@
 ﻿using global::HealthcareHospitalManagementSystem.Services;
-using Healthcare_Hospital_Management_System.Models;
 using Healthcare_Hospital_Management_System.Infrastructure;
+using Healthcare_Hospital_Management_System.Models;
 using System.Net;
 
 namespace Healthcare_Hospital_Management_System.Services
 {
     public class DrugService : IDrugService
     {
-        private readonly IRepository<DrugReportClass> drugReportRepository;
+        private readonly IRepository<DrugReportClass> _drugReportRepository;
+        private readonly DrugClient _drugClient;
 
         public long LogTransactionTime => DateTime.UtcNow.Ticks;
 
-        public DrugService(IRepository<DrugReportClass> drugReportRepository)
+        public DrugService(IRepository<DrugReportClass> drugReportRepository, DrugClient drugClient)
         {
-            this.drugReportRepository = drugReportRepository
+            _drugReportRepository = drugReportRepository
                 ?? throw new ArgumentNullException(nameof(drugReportRepository));
+            _drugClient = drugClient
+                ?? throw new ArgumentNullException(nameof(drugClient));
+        }
+
+        public async Task<DrugReportClass> GetDrugReportAsClassAsync(string searchTerm, CancellationToken cancellationToken)
+        {
+            return await _drugClient.GetDrugReportAsClassAsync(searchTerm, cancellationToken);
+        }
+
+        public async Task<DrugReportStruct> GetDrugReportAsStructAsync(string searchTerm, CancellationToken cancellationToken)
+        {
+            return await _drugClient.GetDrugReportAsStructAsync(searchTerm, cancellationToken);
         }
 
         public async Task<bool> SearchDrugReportAsync(DrugReportClass report, CancellationToken cancellationToken)
         {
-            IEnumerable<DrugReportClass> drugReports = await drugReportRepository.GetAllAsync(cancellationToken);
+            IEnumerable<DrugReportClass> drugReports = await _drugReportRepository.GetAllAsync(cancellationToken);
 
             if (drugReports == null || !drugReports.Any())
             {
@@ -40,12 +53,12 @@ namespace Healthcare_Hospital_Management_System.Services
             if (reportSafetyId == null)
             {
                 result.StatusCode = HttpStatusCode.BadRequest;
-                result.Message = "Report ID must be greater than 0.";
+                result.Message = "Report ID must be provided.";
 
                 return result;
             }
 
-            DrugReportClass? report = await drugReportRepository.GetByIdAsync(reportSafetyId, cancellationToken);
+            DrugReportClass? report = await _drugReportRepository.GetByIdAsync(reportSafetyId, cancellationToken);
 
             if (report == null)
             {
@@ -63,22 +76,29 @@ namespace Healthcare_Hospital_Management_System.Services
 
         public async Task AddDrugReportAsync(DrugReportClass drugReport, CancellationToken cancellationToken)
         {
-            await drugReportRepository.AddAsync(drugReport, cancellationToken);
+            var existingReport = await _drugReportRepository.GetByIdAsync(drugReport.SafetyReportId, cancellationToken);
+            if (existingReport != null)
+            {
+                throw new InvalidOperationException($"A report with SafetyReportId {drugReport.SafetyReportId} already exists.");
+            }
+
+            await _drugReportRepository.AddAsync(drugReport, cancellationToken);
         }
+
 
         public async Task UpdateDrugReportAsync(DrugReportClass drugReport, CancellationToken cancellationToken)
         {
-            await drugReportRepository.UpdateAsync(drugReport, cancellationToken);
+            await _drugReportRepository.UpdateAsync(drugReport, cancellationToken);
         }
 
         public async Task DeleteDrugReportAsync(string reportSafetyId, CancellationToken cancellationToken)
         {
-            await drugReportRepository.DeleteAsync(reportSafetyId, cancellationToken);
+            await _drugReportRepository.DeleteAsync(reportSafetyId, cancellationToken);
         }
 
         public async Task<IEnumerable<DrugReportClass>> GetAllDrugReportsAsync(CancellationToken cancellationToken)
         {
-            IEnumerable<DrugReportClass> drugReports = await drugReportRepository.GetAllAsync(cancellationToken);
+            IEnumerable<DrugReportClass> drugReports = await _drugReportRepository.GetAllAsync(cancellationToken);
 
             return drugReports
                 .Where(drugReport => drugReport != null)
@@ -94,6 +114,12 @@ namespace Healthcare_Hospital_Management_System.Services
                 await transactionLogFileStream.WriteAsync(messageBytes, 0, messageBytes.Length, cancellationToken);
             }
         }
+
+        public async Task<IEnumerable<DrugReportClass>> SearchAndSaveDrugReportsAsync(string searchTerm, CancellationToken cancellationToken)
+        {
+            var reportFromApi = await GetDrugReportAsClassAsync(searchTerm, cancellationToken);
+            await AddDrugReportAsync(reportFromApi, cancellationToken);
+            return await GetAllDrugReportsAsync(cancellationToken);
+        }
     }
 }
-

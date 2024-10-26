@@ -1,14 +1,17 @@
-﻿using System.Text.Json;
+﻿using Healthcare_Hospital_Management_System.Infrastructure;
+using System.Text.Json;
 
 namespace HealthcareHospitalManagementSystem.Services
 {
     public class DrugClient
     {
         private readonly HttpClient _httpClient;
+        private readonly IRepository<DrugReportClass> _drugReportRepository;
 
-        public DrugClient(HttpClient httpClient)
+        public DrugClient(HttpClient httpClient, IRepository<DrugReportClass> drugReportRepository)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _drugReportRepository = drugReportRepository ?? throw new ArgumentNullException(nameof(drugReportRepository));
         }
 
         public async Task<DrugReportClass> GetDrugReportAsClassAsync(string searchTerm, CancellationToken cancellationToken = default)
@@ -18,10 +21,10 @@ namespace HealthcareHospitalManagementSystem.Services
             {
                 throw new InvalidOperationException("API key not found. Please set the 'OPENFDA_API_KEY' environment variable.");
             }
+
             var jsonData = await FetchApiData(searchTerm, apiKey, cancellationToken);
             return ParseDataAsClass(jsonData);
         }
-
         public async Task<DrugReportStruct> GetDrugReportAsStructAsync(string searchTerm, CancellationToken cancellationToken = default)
         {
             string apiKey = Environment.GetEnvironmentVariable("OPENFDA_API_KEY");
@@ -29,10 +32,10 @@ namespace HealthcareHospitalManagementSystem.Services
             {
                 throw new InvalidOperationException("API key not found. Please set the 'OPENFDA_API_KEY' environment variable.");
             }
+
             var jsonData = await FetchApiData(searchTerm, apiKey, cancellationToken);
             return ParseDataAsStruct(jsonData);
         }
-
         private async Task<string> FetchApiData(string searchTerm, string apiKey, CancellationToken cancellationToken)
         {
             var requestUrl = $"https://api.fda.gov/drug/event.json?search={searchTerm}&api_key={apiKey}";
@@ -89,6 +92,31 @@ namespace HealthcareHospitalManagementSystem.Services
                 reactionsList.Add(reaction.GetProperty("reactionmeddrapt").GetString());
             }
             return reactionsList;
+        }
+
+        public async Task<IEnumerable<DrugReportClass>> GetAllDrugReportsFromDbAsync(CancellationToken cancellationToken = default)
+        {
+            return await _drugReportRepository.GetAllAsync(cancellationToken);
+        }
+
+        public async Task<DrugReportClass> GetDrugReportByIdFromDbAsync(string reportSafetyId, CancellationToken cancellationToken = default)
+        {
+            return await _drugReportRepository.GetByIdAsync(reportSafetyId, cancellationToken);
+        }
+
+        public async Task AddDrugReportToDbAsync(DrugReportClass drugReport, CancellationToken cancellationToken = default)
+        {
+            await _drugReportRepository.AddAsync(drugReport, cancellationToken);
+        }
+
+        public async Task UpdateDrugReportInDbAsync(DrugReportClass drugReport, CancellationToken cancellationToken = default)
+        {
+            await _drugReportRepository.UpdateAsync(drugReport, cancellationToken);
+        }
+
+        public async Task DeleteDrugReportFromDbAsync(string reportSafetyId, CancellationToken cancellationToken = default)
+        {
+            await _drugReportRepository.DeleteAsync(reportSafetyId, cancellationToken);
         }
     }
 }
