@@ -93,30 +93,5 @@ namespace HealthcareHospitalManagementSystem.Services
             }
             return reactionsList;
         }
-
-        public async Task<IEnumerable<DrugReportClass>> GetAllDrugReportsFromDbAsync(CancellationToken cancellationToken = default)
-        {
-            return await _drugReportRepository.GetAllAsync(cancellationToken);
-        }
-
-        public async Task<DrugReportClass> GetDrugReportByIdFromDbAsync(string reportSafetyId, CancellationToken cancellationToken = default)
-        {
-            return await _drugReportRepository.GetByIdAsync(reportSafetyId, cancellationToken);
-        }
-
-        public async Task AddDrugReportToDbAsync(DrugReportClass drugReport, CancellationToken cancellationToken = default)
-        {
-            await _drugReportRepository.AddAsync(drugReport, cancellationToken);
-        }
-
-        public async Task UpdateDrugReportInDbAsync(DrugReportClass drugReport, CancellationToken cancellationToken = default)
-        {
-            await _drugReportRepository.UpdateAsync(drugReport, cancellationToken);
-        }
-
-        public async Task DeleteDrugReportFromDbAsync(string reportSafetyId, CancellationToken cancellationToken = default)
-        {
-            await _drugReportRepository.DeleteAsync(reportSafetyId, cancellationToken);
-        }
     }
 }

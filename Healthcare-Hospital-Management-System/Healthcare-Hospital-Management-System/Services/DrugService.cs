@@ -102,7 +102,8 @@ namespace Healthcare_Hospital_Management_System.Services
 
             return drugReports
                 .Where(drugReport => drugReport != null)
-                .OrderBy(drugReport => drugReport.SafetyReportId)
+                .OrderByDescending(drugReport => drugReport.SafetyReportId)
+                .Select(drugReport => drugReport)
                 .ToList();
         }
 
