@@ -18,7 +18,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IDrugService, DrugService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
-builder.Services.AddScoped<ICustomLogger, Logger>();
+builder.Services.AddScoped<IHealthcareLogger, HealthcareLogger>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<DrugClient>();

@@ -14,7 +14,7 @@ namespace HealthcareHospitalManagementSystem.Services
             _drugReportRepository = drugReportRepository ?? throw new ArgumentNullException(nameof(drugReportRepository));
         }
 
-        public async Task<DrugReportClass> GetDrugReportAsClassAsync(string searchTerm, CancellationToken cancellationToken = default)
+        public async Task<DrugReportClass> GetDrugReportAsClassAsync(string searchTerm, CancellationToken cancellationToken)
         {
             string apiKey = Environment.GetEnvironmentVariable("OPENFDA_API_KEY");
             if (string.IsNullOrEmpty(apiKey))
@@ -25,7 +25,7 @@ namespace HealthcareHospitalManagementSystem.Services
             var jsonData = await FetchApiData(searchTerm, apiKey, cancellationToken);
             return ParseDataAsClass(jsonData);
         }
-        public async Task<DrugReportStruct> GetDrugReportAsStructAsync(string searchTerm, CancellationToken cancellationToken = default)
+        public async Task<DrugReportStruct> GetDrugReportAsStructAsync(string searchTerm, CancellationToken cancellationToken)
         {
             string apiKey = Environment.GetEnvironmentVariable("OPENFDA_API_KEY");
             if (string.IsNullOrEmpty(apiKey))
