@@ -1,12 +1,10 @@
-using Microsoft.Extensions.Logging;
-
 namespace HealthcareHospitalManagementSystem.Infrastructure
 {
-    public class Logger
+    public class HealthcareLogger : IHealthcareLogger
     {
-        private readonly ILogger<Logger> _logger;
+        private readonly ILogger<HealthcareLogger> _logger;
 
-        public Logger(ILogger<Logger> logger)
+        public HealthcareLogger(ILogger<HealthcareLogger> logger)
         {
             _logger = logger;
         }
