@@ -1,0 +1,1 @@
+$Env:OPENFDA_API_KEY = "zFdVTKJ31smmPSYVy7aIhsrxub0yWy6hdCY4xPgm"

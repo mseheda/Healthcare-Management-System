@@ -1,11 +1,10 @@
-using System.Collections.Generic;
 using HealthcareHospitalManagementSystem.Models;
 
 namespace HealthcareHospitalManagementSystem.Services
 {
     public interface IDoctorService
     {
-        List<Doctor> GetAllDoctors();
-        void AddDoctor(Doctor doctor);
+        void AddDoctor(Doctor doctor, NotificationService notifnotificationService);
+        List<Doctor> GetDoctors();
     }
 }
