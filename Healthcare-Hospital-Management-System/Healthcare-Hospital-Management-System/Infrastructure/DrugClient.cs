@@ -1,38 +1,41 @@
-﻿using System.Text.Json;
+﻿using Healthcare_Hospital_Management_System.Infrastructure;
+using System.Text.Json;
 
 namespace HealthcareHospitalManagementSystem.Services
 {
     public class DrugClient
     {
         private readonly HttpClient _httpClient;
+        private readonly IRepository<DrugReportClass> _drugReportRepository;
 
-        public DrugClient(HttpClient httpClient)
+        public DrugClient(HttpClient httpClient, IRepository<DrugReportClass> drugReportRepository)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _drugReportRepository = drugReportRepository ?? throw new ArgumentNullException(nameof(drugReportRepository));
         }
 
-        public async Task<DrugReportClass> GetDrugReportAsClassAsync(string searchTerm, CancellationToken cancellationToken = default)
+        public async Task<DrugReportClass> GetDrugReportAsClassAsync(string searchTerm, CancellationToken cancellationToken)
         {
             string apiKey = Environment.GetEnvironmentVariable("OPENFDA_API_KEY");
             if (string.IsNullOrEmpty(apiKey))
             {
                 throw new InvalidOperationException("API key not found. Please set the 'OPENFDA_API_KEY' environment variable.");
             }
+
             var jsonData = await FetchApiData(searchTerm, apiKey, cancellationToken);
             return ParseDataAsClass(jsonData);
         }
-
-        public async Task<DrugReportStruct> GetDrugReportAsStructAsync(string searchTerm, CancellationToken cancellationToken = default)
+        public async Task<DrugReportStruct> GetDrugReportAsStructAsync(string searchTerm, CancellationToken cancellationToken)
         {
             string apiKey = Environment.GetEnvironmentVariable("OPENFDA_API_KEY");
             if (string.IsNullOrEmpty(apiKey))
             {
                 throw new InvalidOperationException("API key not found. Please set the 'OPENFDA_API_KEY' environment variable.");
             }
+
             var jsonData = await FetchApiData(searchTerm, apiKey, cancellationToken);
             return ParseDataAsStruct(jsonData);
         }
-
         private async Task<string> FetchApiData(string searchTerm, string apiKey, CancellationToken cancellationToken)
         {
             var requestUrl = $"https://api.fda.gov/drug/event.json?search={searchTerm}&api_key={apiKey}";

@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 public class DoctorsController : ControllerBase
 {
     private readonly IDoctorService _doctorService;
-    private readonly ICustomLogger _logger;
+    private readonly IHealthcareLogger _logger;
     private readonly INotificationService _notificationService;
 
-    public DoctorsController(IDoctorService doctorService, ICustomLogger logger, INotificationService notificationService)
+    public DoctorsController(IDoctorService doctorService, IHealthcareLogger logger, INotificationService notificationService)
     {
         _doctorService = doctorService;
         _logger = logger;
@@ -19,7 +19,7 @@ public class DoctorsController : ControllerBase
 
         if (_doctorService is DoctorService service)
         {
-            service.Logger = (Logger)logger;
+            service.Logger = (HealthcareLogger)logger;
             service.Logger.Log("DoctorService instance created.");
         }
     }
