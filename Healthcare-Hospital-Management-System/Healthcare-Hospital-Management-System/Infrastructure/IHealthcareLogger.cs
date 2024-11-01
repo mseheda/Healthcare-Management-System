@@ -1,6 +1,6 @@
 ﻿namespace HealthcareHospitalManagementSystem.Infrastructure
 {
-    public interface ICustomLogger
+    public interface IHealthcareLogger
     {
         void Log(string message);
         void LogError(string message);
