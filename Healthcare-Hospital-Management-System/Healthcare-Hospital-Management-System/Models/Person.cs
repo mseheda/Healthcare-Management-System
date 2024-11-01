@@ -5,20 +5,20 @@ namespace HealthcareHospitalManagementSystem.Models
         private string _name;
         private int _age;
 
-        public string Name 
-        { 
-            get { return _name; } 
-            set { _name = value; } 
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
         }
 
-        public int Age 
-        { 
-            get { return _age; } 
-            set 
-            { 
+        public int Age
+        {
+            get { return _age; }
+            set
+            {
                 if (value < 0)
                     throw new ArgumentException("Age cannot be negative");
-                _age = value; 
+                _age = value;
             }
         }
 
