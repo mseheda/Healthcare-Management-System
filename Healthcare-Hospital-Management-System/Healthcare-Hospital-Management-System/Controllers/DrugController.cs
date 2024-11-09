@@ -121,5 +121,53 @@ namespace HealthcareHospitalManagementSystem.Controllers
             await _drugService.LogTransactionAsync(message, cancellationToken);
             return Ok("Transaction logged successfully.");
         }
+
+        [HttpGet("executeOperation")]
+        public async Task<IActionResult> ExecuteOperationAsync(string term1, string term2, string operation, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(term1) || string.IsNullOrWhiteSpace(term2))
+            {
+                return BadRequest("Both search terms must be provided.");
+            }
+
+            switch (operation.ToLower())
+            {
+                case "compare":
+                    var lessSeriousReport = await _drugService.ExecuteDrugReportOperationAsync<DrugReportClass>(
+                        term1, term2, _drugService.GetCompareSeriousnessOperation(), cancellationToken);
+                    return Ok(new { LessSeriousReport = lessSeriousReport });
+
+                case "union":
+                    var unionOfReactions = await _drugService.ExecuteDrugReportOperationAsync<List<string>>(
+                        term1, term2, _drugService.GetUnionReactionsOperation(), cancellationToken);
+                    return Ok(new { UnionOfReactions = unionOfReactions });
+
+                case "intersect":
+                    var intersectionOfReactions = await _drugService.ExecuteDrugReportOperationAsync<List<string>>(
+                        term1, term2, _drugService.GetIntersectReactionsOperation(), cancellationToken);
+                    return Ok(new { IntersectionOfReactions = intersectionOfReactions });
+
+                default:
+                    return BadRequest("Invalid operation type. Use 'compare', 'union', or 'intersect'.");
+            }
+        }
+
+        [HttpGet("filterBySeriousness")]
+        public async Task<IActionResult> FilterBySeriousnessAsync(int minSeriousness, CancellationToken cancellationToken)
+        {
+            IDrugService.DrugReportFilterDelegate seriousnessFilter = report => int.Parse(report.Serious) >= minSeriousness;
+
+            var filteredReports = await _drugService.FilterDrugReportsAsync(seriousnessFilter, cancellationToken);
+            return Ok(filteredReports);
+        }
+
+        [HttpGet("filterByCountry")]
+        public async Task<IActionResult> FilterByCountryAsync(string country, CancellationToken cancellationToken)
+        {
+            IDrugService.DrugReportFilterDelegate countryFilter = report => report.PrimarySourceCountry.Equals(country, StringComparison.OrdinalIgnoreCase);
+
+            var filteredReports = await _drugService.FilterDrugReportsAsync(countryFilter, cancellationToken);
+            return Ok(filteredReports);
+        }
     }
 }

@@ -37,7 +37,7 @@ public class DoctorService : IDoctorService
         message = $"Doctor {doctor.Name} has been successfully added.";
         Logger?.Log(message);
 
-        notificationService?.SendNotificationAsync(message, CancellationToken.None);
+        notificationService?.SendNotificationDoctorAsync(message, CancellationToken.None);
     }
 
     public List<Doctor> GetDoctors()

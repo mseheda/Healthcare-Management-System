@@ -10,8 +10,6 @@ namespace Healthcare_Hospital_Management_System.Services
         private readonly IRepository<DrugReportClass> _drugReportRepository;
         private readonly DrugClient _drugClient;
 
-        public long LogTransactionTime => DateTime.UtcNow.Ticks;
-
         public DrugService(IRepository<DrugReportClass> drugReportRepository, DrugClient drugClient)
         {
             _drugReportRepository = drugReportRepository
@@ -19,6 +17,34 @@ namespace Healthcare_Hospital_Management_System.Services
             _drugClient = drugClient
                 ?? throw new ArgumentNullException(nameof(drugClient));
         }
+        public async Task<TResult> ExecuteDrugReportOperationAsync<TResult>(string term1, string term2, IDrugService.DrugReportOperation<TResult> operation, CancellationToken cancellationToken)
+        {
+            var report1 = await _drugClient.GetDrugReportAsClassAsync(term1, cancellationToken);
+            var report2 = await _drugClient.GetDrugReportAsClassAsync(term2, cancellationToken);
+
+            return operation(report1, report2);
+        }
+
+        private DrugReportClass CompareSeriousness(DrugReportClass report1, DrugReportClass report2) =>
+            int.Parse(report1.Serious) < int.Parse(report2.Serious) ? report1 : report2;
+
+        private List<string> UnionReactions(DrugReportClass report1, DrugReportClass report2) =>
+            report1.Reactions.Union(report2.Reactions).ToList();
+
+        private List<string> IntersectReactions(DrugReportClass report1, DrugReportClass report2) =>
+            report1.Reactions.Intersect(report2.Reactions).ToList();
+
+        public IDrugService.DrugReportOperation<DrugReportClass> GetCompareSeriousnessOperation() => CompareSeriousness;
+        public IDrugService.DrugReportOperation<List<string>> GetUnionReactionsOperation() => UnionReactions;
+        public IDrugService.DrugReportOperation<List<string>> GetIntersectReactionsOperation() => IntersectReactions;
+
+        public async Task<IEnumerable<DrugReportClass>> FilterDrugReportsAsync(IDrugService.DrugReportFilterDelegate filter, CancellationToken cancellationToken)
+        {
+            var allReports = await _drugReportRepository.GetAllAsync(cancellationToken);
+            return allReports.Where(report => filter(report)).ToList();
+        }
+
+        public long LogTransactionTime => DateTime.UtcNow.Ticks;
 
         public async Task<DrugReportClass> GetDrugReportAsClassAsync(string searchTerm, CancellationToken cancellationToken)
         {
