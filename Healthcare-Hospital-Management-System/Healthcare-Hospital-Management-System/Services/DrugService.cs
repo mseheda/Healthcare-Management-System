@@ -17,6 +17,9 @@ namespace Healthcare_Hospital_Management_System.Services
             _drugClient = drugClient
                 ?? throw new ArgumentNullException(nameof(drugClient));
         }
+
+        public event EventHandler<DrugReportEventArgs> DrugReportAdded;
+
         public async Task<TResult> ExecuteDrugReportOperationAsync<TResult>(string term1, string term2, IDrugService.DrugReportOperation<TResult> operation, CancellationToken cancellationToken)
         {
             var report1 = await _drugClient.GetDrugReportAsClassAsync(term1, cancellationToken);
@@ -109,8 +112,12 @@ namespace Healthcare_Hospital_Management_System.Services
             }
 
             await _drugReportRepository.AddAsync(drugReport, cancellationToken);
+            OnDrugReportAdded(drugReport);
         }
-
+        protected virtual void OnDrugReportAdded(DrugReportClass drugReport)
+        {
+            DrugReportAdded?.Invoke(this, new DrugReportEventArgs(drugReport));
+        }
 
         public async Task UpdateDrugReportAsync(DrugReportClass drugReport, CancellationToken cancellationToken)
         {
@@ -147,6 +154,15 @@ namespace Healthcare_Hospital_Management_System.Services
             var reportFromApi = await GetDrugReportAsClassAsync(searchTerm, cancellationToken);
             await AddDrugReportAsync(reportFromApi, cancellationToken);
             return await GetAllDrugReportsAsync(cancellationToken);
+        }
+    }
+    public class DrugReportEventArgs : EventArgs
+    {
+        public DrugReportClass DrugReport { get; }
+
+        public DrugReportEventArgs(DrugReportClass drugReport)
+        {
+            DrugReport = drugReport;
         }
     }
 }

@@ -27,5 +27,7 @@ namespace Healthcare_Hospital_Management_System.Services
 
         public delegate bool DrugReportFilterDelegate(DrugReportClass report);
         Task<IEnumerable<DrugReportClass>> FilterDrugReportsAsync(DrugReportFilterDelegate filter, CancellationToken cancellationToken);
+
+        event EventHandler<DrugReportEventArgs> DrugReportAdded;
     }
 }
