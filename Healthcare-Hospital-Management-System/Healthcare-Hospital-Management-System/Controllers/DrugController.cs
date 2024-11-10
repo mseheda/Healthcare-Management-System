@@ -18,14 +18,14 @@ namespace HealthcareHospitalManagementSystem.Controllers
                 ?? throw new ArgumentNullException(nameof(drugService));
         }
 
-        [HttpGet("Get_All_Drug_Reports")]
+        [HttpGet("Get_All_DrugReports")]
         public async Task<ActionResult<IEnumerable<DrugReportClass>>> GetAllDrugReportsAsync(CancellationToken cancellationToken)
         {
             var reports = await _drugService.GetAllDrugReportsAsync(cancellationToken);
             return Ok(reports);
         }
 
-        [HttpGet("Get_Drug_Report_by_SafetyID")]
+        [HttpGet("Get_DrugReport")]
         public async Task<ActionResult<DrugReportResult>> GetDrugReportAsync(string reportSafetyId, CancellationToken cancellationToken)
         {
             var result = await _drugService.GetDrugReportAsync(reportSafetyId, cancellationToken);
@@ -43,14 +43,14 @@ namespace HealthcareHospitalManagementSystem.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("Delete_Drug_Report_by_SafetyID")]
+        [HttpDelete("Delete_DrugReport")]
         public async Task<IActionResult> DeleteDrugReportAsync(string reportSafetyId, CancellationToken cancellationToken)
         {
             await _drugService.DeleteDrugReportAsync(reportSafetyId, cancellationToken);
             return NoContent();
         }
         
-        [HttpPost("Insert_a_New_Drug_Report_into_the_Database")]
+        [HttpPost("Create_DrugReport")]
         public async Task<IActionResult> CreateDrugReportFromExternalAsync(string term, CancellationToken cancellationToken)
         {
             var drugReport = await _drugService.GetDrugReportAsClassAsync(term, cancellationToken);
@@ -65,7 +65,7 @@ namespace HealthcareHospitalManagementSystem.Controllers
             return Created($"api/drug/{drugReport.SafetyReportId}", drugReport);
         }
 
-        [HttpPut("Update_an_Existing_Drug_Report")]
+        [HttpPut("Update_DrugReport")]
         public async Task<IActionResult> UpdateDrugReportAsync(string reportSafetyId, [FromBody] DrugReportClass drugReport, CancellationToken cancellationToken)
         {
             if (reportSafetyId != drugReport.SafetyReportId)
