@@ -14,9 +14,20 @@ namespace Healthcare_Hospital_Management_System.Services
         Task UpdateDrugReportAsync(DrugReportClass drugReport, CancellationToken cancellationToken);
         Task DeleteDrugReportAsync(string reportSafetyId, CancellationToken cancellationToken);
         Task<IEnumerable<DrugReportClass>> GetAllDrugReportsAsync(CancellationToken cancellationToken);
-
         Task LogTransactionAsync(string message, CancellationToken cancellationToken);
-
         Task<IEnumerable<DrugReportClass>> SearchAndSaveDrugReportsAsync(string searchTerm, CancellationToken cancellationToken);
+
+        public delegate TResult DrugReportOperation<TResult>(DrugReportClass report1, DrugReportClass report2);
+
+        Task<TResult> ExecuteDrugReportOperationAsync<TResult>(string term1, string term2, DrugReportOperation<TResult> operation, CancellationToken cancellationToken);
+
+        DrugReportOperation<DrugReportClass> GetCompareSeriousnessOperation();
+        DrugReportOperation<List<string>> GetUnionReactionsOperation();
+        DrugReportOperation<List<string>> GetIntersectReactionsOperation();
+
+        public delegate bool DrugReportFilterDelegate(DrugReportClass report);
+        Task<IEnumerable<DrugReportClass>> FilterDrugReportsAsync(DrugReportFilterDelegate filter, CancellationToken cancellationToken);
+
+        event EventHandler<DrugReportEventArgs> DrugReportAdded;
     }
 }

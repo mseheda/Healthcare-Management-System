@@ -37,4 +37,11 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>() as NotificationService;
+    notificationService?.StartListening();
+}
+
 app.Run();
