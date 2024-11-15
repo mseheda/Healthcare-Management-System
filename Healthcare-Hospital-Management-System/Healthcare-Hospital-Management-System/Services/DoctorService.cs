@@ -49,4 +49,59 @@ public class DoctorService : IDoctorService
     {
         return !string.IsNullOrWhiteSpace(doctor.Name) && !string.IsNullOrWhiteSpace(doctor.Specialization);
     }
+
+    public List<Doctor> GetAvailableDoctors(string specialization, DateTime date, TimeSpan? time = null)
+    {
+        var dateTimeFilter = time.HasValue ? date.Date + time.Value : (DateTime?)null;
+
+        return _doctors.Where(d =>
+            d.Specialization.Equals(specialization, StringComparison.OrdinalIgnoreCase) &&
+            d.AvailableDates.Any(slot =>
+                slot.Date == date.Date && (!dateTimeFilter.HasValue || slot == dateTimeFilter)))
+        .ToList();
+    }
+
+    public bool ScheduleAppointment(string doctorName, string specialization, DateTime date, TimeSpan time)
+    {
+        var doctor = _doctors.FirstOrDefault(d =>
+            d.Name.Equals(doctorName, StringComparison.OrdinalIgnoreCase) &&
+            d.Specialization.Equals(specialization, StringComparison.OrdinalIgnoreCase));
+
+        if (doctor == null)
+        {
+            return false;
+        }
+
+        var dateTimeSlot = date.Date + time;
+
+        if (!doctor.AvailableDates.Contains(dateTimeSlot))
+        {
+            return false;
+        }
+
+        doctor.AvailableDates.Remove(dateTimeSlot);
+        return true;
+    }
+
+    public bool AddTimeSlot(string doctorName, string specialization, DateTime date, TimeSpan time)
+    {
+        var doctor = _doctors.FirstOrDefault(d =>
+            d.Name.Equals(doctorName, StringComparison.OrdinalIgnoreCase) &&
+            d.Specialization.Equals(specialization, StringComparison.OrdinalIgnoreCase));
+
+        if (doctor == null)
+        {
+            return false;
+        }
+
+        var newDateTime = date.Date + time;
+
+        if (doctor.AvailableDates.Contains(newDateTime))
+        {
+            return false;
+        }
+
+        doctor.AvailableDates.Add(newDateTime);
+        return true;
+    }
 }

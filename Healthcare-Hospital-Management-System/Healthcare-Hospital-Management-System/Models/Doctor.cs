@@ -4,6 +4,7 @@ namespace HealthcareHospitalManagementSystem.Models
     {
         public string Specialization { get; set; }
         public string Department { get; set; }
+        public List<DateTime> AvailableDates { get; set; } = new List<DateTime>();
 
         public override string DisplayInfo()
         {
