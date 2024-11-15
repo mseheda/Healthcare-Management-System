@@ -142,11 +142,16 @@ namespace Healthcare_Hospital_Management_System.Services
 
         public async Task LogTransactionAsync(string message, CancellationToken cancellationToken)
         {
-            using (var transactionLogFileStream = new FileStream("drug_transaction.log", FileMode.Append))
+            Func<string, CancellationToken, Task> logToFileAsync = async (logMessage, token) =>
             {
-                byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes($"{LogTransactionTime}: {message}\n");
-                await transactionLogFileStream.WriteAsync(messageBytes, 0, messageBytes.Length, cancellationToken);
-            }
+                using (var transactionLogFileStream = new FileStream("drug_transaction.log", FileMode.Append))
+                {
+                    byte[] messageBytes = System.Text.Encoding.UTF8.GetBytes($"{DateTime.UtcNow}: {logMessage}\n");
+                    await transactionLogFileStream.WriteAsync(messageBytes, 0, messageBytes.Length, token);
+                }
+            };
+
+            await logToFileAsync(message, cancellationToken);
         }
 
         public async Task<IEnumerable<DrugReportClass>> SearchAndSaveDrugReportsAsync(string searchTerm, CancellationToken cancellationToken)
