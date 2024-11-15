@@ -1,6 +1,6 @@
 ﻿namespace HealthcareHospitalManagementSystem.Services
 {
-    public class DrugReportClass : ReportBase
+    public class DrugReportClass
     {
         public string SafetyReportId { get; set; }
         public string ReportDate { get; set; }
@@ -12,24 +12,5 @@
         public List<string> Reactions { get; set; }
         public string SenderOrganization { get; set; }
         public string ReceiverOrganization { get; set; }
-
-        public override string GetSummary()
-        {
-            return $"Report ID: {SafetyReportId}, Seriousness: {Serious}";
-        }
-
-        public string GetSummary(bool detailed)
-        {
-            if (detailed)
-            {
-                return $"Report ID: {SafetyReportId}, Date: {ReportDate}, Country: {PrimarySourceCountry}, Seriousness: {Serious}";
-            }
-            return GetSummary();
-        }
-
-        public new string GetSummary(int year)
-        {
-            return $"Report ID: {SafetyReportId} for the year {year}.";
-        }
     }
 }
