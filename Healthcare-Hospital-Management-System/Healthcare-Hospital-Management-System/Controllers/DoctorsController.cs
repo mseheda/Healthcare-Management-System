@@ -73,21 +73,4 @@ public class DoctorsController : ControllerBase
             return StatusCode(500, ex.Message);
         }
     }
-
-    [HttpGet("AvailableDoctors")]
-    public ActionResult<List<Doctor>> GetAvailableDoctors(
-    [FromQuery] string specialization,
-    [FromQuery] DateTime date,
-    [FromQuery] TimeSpan? time = null)
-    {
-        var doctors = _doctorService.GetAvailableDoctors(specialization, date, time);
-
-        if (!doctors.Any())
-        {
-            return NotFound($"No available doctors found for specialization {specialization} on {date:yyyy-MM-dd}" +
-                            (time.HasValue ? $" at {time}" : ""));
-        }
-
-        return Ok(doctors);
-    }
 }
