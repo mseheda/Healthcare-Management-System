@@ -53,21 +53,6 @@ public class DoctorsController : ControllerBase
         }
     }
 
-    [HttpPost("AddTimeSlot")]
-    public ActionResult AddTimeSlot(
-    [FromQuery] string doctorName,
-    [FromQuery] string specialization,
-    [FromQuery] DateTime date,
-    [FromQuery] TimeSpan time)
-    {
-        if (_doctorService.AddTimeSlot(doctorName, specialization, date, time))
-        {
-            return Ok("Time slot added successfully.");
-        }
-
-        return BadRequest("Failed to add time slot. The doctor may not exist, or the time slot may already be added.");
-    }
-
     [HttpGet]
     public ActionResult<List<Doctor>> GetDoctors()
     {
@@ -104,20 +89,5 @@ public class DoctorsController : ControllerBase
         }
 
         return Ok(doctors);
-    }
-
-    [HttpPost("Schedule")]
-    public ActionResult ScheduleAppointment(
-    [FromQuery] string doctorName,
-    [FromQuery] string specialization,
-    [FromQuery] DateTime date,
-    [FromQuery] TimeSpan time)
-    {
-        if (_doctorService.ScheduleAppointment(doctorName, specialization, date, time))
-        {
-            return Ok("Appointment scheduled successfully.");
-        }
-
-        return BadRequest("Failed to schedule appointment. The doctor may not be available on the selected date and time.");
     }
 }

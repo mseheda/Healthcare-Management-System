@@ -5,11 +5,11 @@ namespace Healthcare_Hospital_Management_System.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DrugInventoryController : ControllerBase
+    public class DrugReportingController : ControllerBase
     {
         private readonly IDrugInventoryService _drugInventoryService;
 
-        public DrugInventoryController(IDrugInventoryService drugInventoryService)
+        public DrugReportingController(IDrugInventoryService drugInventoryService)
         {
             _drugInventoryService = drugInventoryService
                 ?? throw new ArgumentNullException(nameof(drugInventoryService));
