@@ -53,7 +53,6 @@ public class DoctorsController : ControllerBase
         }
     }
 
-
     [HttpGet]
     public ActionResult<List<Doctor>> GetDoctors()
     {

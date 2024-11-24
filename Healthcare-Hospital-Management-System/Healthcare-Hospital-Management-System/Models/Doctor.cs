@@ -1,9 +1,12 @@
+using Healthcare_Hospital_Management_System.Models;
+
 namespace HealthcareHospitalManagementSystem.Models
 {
     public class Doctor : Person
     {
         public string Specialization { get; set; }
         public string Department { get; set; }
+        public List<TimeSlot> AvailableTimeSlots { get; set; } = new List<TimeSlot>();
 
         public override string DisplayInfo()
         {
