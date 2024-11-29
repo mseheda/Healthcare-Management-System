@@ -1,11 +1,13 @@
 ﻿using Healthcare_Hospital_Management_System.Models;
 using Healthcare_Hospital_Management_System.Services;
 using HealthcareHospitalManagementSystem.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace HealthcareHospitalManagementSystem.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class DrugController : ControllerBase
