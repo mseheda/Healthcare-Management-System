@@ -29,11 +29,5 @@ namespace Healthcare_Hospital_Management_System.Services
             var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(plainPassword));
             return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
         }
-
-        private string HashPassword(string email, string plainPassword)
-        {
-            var passwordHasher = new PasswordHasher<string>();
-            return passwordHasher.HashPassword(email, plainPassword);
-        }
     }
 }
