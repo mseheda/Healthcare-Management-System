@@ -77,7 +77,7 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Configuration.AddUserSecrets<Program>();
 
 builder.Services.AddHttpClient();
-builder.Services.AddHttpClient<DrugClient>();
+builder.Services.AddHttpClient<IDrugClient, DrugClient>();
 
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();

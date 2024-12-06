@@ -8,14 +8,14 @@ public class DoctorService : IDoctorService
     private static List<Doctor> _doctors;
     private const int MaxDoctors = 50;
     public static int TotalDoctorsAdded { get; private set; } = 0;
-    public HealthcareLogger Logger { get; set; }
+    public IHealthcareLogger Logger { get; set; }
 
     static DoctorService()
     {
         _doctors = new List<Doctor>();
     }
 
-    public void AddDoctor(Doctor doctor, NotificationService? notificationService)
+    public void AddDoctor(Doctor doctor, INotificationService? notificationService)
     {
         if (doctor == null)
         {

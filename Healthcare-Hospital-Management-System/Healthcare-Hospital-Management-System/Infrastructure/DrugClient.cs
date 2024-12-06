@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace HealthcareHospitalManagementSystem.Services
 {
-    public class DrugClient
+    public class DrugClient : IDrugClient
     {
         private readonly HttpClient _httpClient;
         private readonly IRepository<DrugReportClass> _drugReportRepository;
