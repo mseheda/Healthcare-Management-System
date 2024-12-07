@@ -47,7 +47,8 @@ builder.Services.AddSingleton<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IDrugService, DrugService>();
 builder.Services.AddScoped<IDrugInventoryService, DrugInventoryService>();
 builder.Services.AddScoped<StaffNotificationService>();
-builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddSingleton<IDataProtectService, DataProtectService>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
 builder.Services.AddScoped<IHealthcareLogger, HealthcareLogger>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
