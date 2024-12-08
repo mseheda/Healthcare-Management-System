@@ -25,11 +25,6 @@ namespace Healthcare_Hospital_Management_System.Services
             _rsa.ImportRSAPublicKey(keyBytes, out _);
         }
 
-        public string ExportPrivateKey()
-        {
-            return Convert.ToBase64String(_rsa.ExportRSAPrivateKey());
-        }
-
         public void ImportPrivateKeyFromSecrets()
         {
             string privateKey = _configuration["EncryptionKeys:PrivateKey"];

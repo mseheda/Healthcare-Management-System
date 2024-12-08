@@ -7,7 +7,6 @@ namespace Healthcare_Hospital_Management_System.Services
     {
         string ExportPublicKey();
         void ImportPublicKey(string publicKey);
-        string ExportPrivateKey();
         void ImportPrivateKeyFromSecrets();
         Task<byte[]> EncryptAsync(string publicKey, string plainText, CancellationToken cancellationToken);
         Task<string> DecryptAsync(byte[] encryptedData, CancellationToken cancellationToken);

@@ -1,9 +1,6 @@
-﻿using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Healthcare_Hospital_Management_System.Services;
+﻿using Healthcare_Hospital_Management_System.Services;
 using HealthcareHospitalManagementSystem.Services;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace Healthcare_Hospital_Management_System.UnitTests
@@ -12,17 +9,22 @@ namespace Healthcare_Hospital_Management_System.UnitTests
     public class NotificationServiceTests
     {
         private Mock<IDrugService> _mockDrugService;
+        private Mock<IConfiguration> _mockConfiguration;
+        private Mock<IDataProtectService> _mockDataProtectService;
         private NotificationService _notificationService;
 
         [TestInitialize]
         public void Setup()
         {
             _mockDrugService = new Mock<IDrugService>();
-            _notificationService = new NotificationService(_mockDrugService.Object);
+            _mockConfiguration = new Mock<IConfiguration>();
+            _mockDataProtectService = new Mock<IDataProtectService>();
+
+            _notificationService = new NotificationService(_mockDrugService.Object, _mockDataProtectService.Object);
         }
 
         [TestMethod]
-        public async Task SendNotificationDoctorAsync_AppendsToLogFile()
+        public async Task SendNotificationDoctorAsync_EncryptsAndWritesToFile()
         {
             // Arrange
             string testFilePath = "transactions.log";
@@ -34,13 +36,28 @@ namespace Healthcare_Hospital_Management_System.UnitTests
                 File.Delete(testFilePath);
             }
 
+            string timestampedMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}: {message}";
+            string publicKey = "mockPublicKey";
+            byte[] encryptedMessage = new byte[] { 0x01, 0x02, 0x03 };
+
+            _mockDataProtectService
+                .Setup(service => service.ExportPublicKey())
+                .Returns(publicKey);
+
+            _mockDataProtectService
+                .Setup(service => service.EncryptAsync(publicKey, timestampedMessage, cancellationToken))
+                .ReturnsAsync(encryptedMessage);
+
             // Act
             await _notificationService.SendNotificationDoctorAsync(message, cancellationToken);
 
             // Assert
             Assert.IsTrue(File.Exists(testFilePath), "The log file was not created.");
-            string logContents = await File.ReadAllTextAsync(testFilePath);
-            Assert.IsTrue(logContents.Contains(message), "The message was not logged correctly.");
+            byte[] fileContents = await File.ReadAllBytesAsync(testFilePath);
+            CollectionAssert.AreEqual(encryptedMessage, fileContents, "The encrypted message was not written correctly.");
+
+            _mockDataProtectService.Verify(service => service.ExportPublicKey(), Times.Once);
+            _mockDataProtectService.Verify(service => service.EncryptAsync(publicKey, timestampedMessage, cancellationToken), Times.Once);
         }
 
         [TestMethod]
