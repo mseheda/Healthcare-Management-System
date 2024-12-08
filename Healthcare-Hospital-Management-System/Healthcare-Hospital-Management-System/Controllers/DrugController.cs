@@ -91,31 +91,7 @@ namespace HealthcareHospitalManagementSystem.Controllers
         {
             var result = await _drugService.GetDrugReportAsStructAsync(term, cancellationToken);
             return Ok(result);
-        }
-
-        [HttpGet("getSummary")]
-        public async Task<IActionResult> GetSummaryAsync(string term, CancellationToken cancellationToken)
-        {
-            var report = await _drugService.GetDrugReportAsClassAsync(term, cancellationToken);
-            var summary = report.GetSummary();
-            return Ok(summary);
-        }
-
-        [HttpGet("getDetailedSummary")]
-        public async Task<IActionResult> GetDetailedSummaryAsync(string term, bool detailed, CancellationToken cancellationToken)
-        {
-            var report = await _drugService.GetDrugReportAsClassAsync(term, cancellationToken);
-            var summary = report.GetSummary(detailed);
-            return Ok(summary);
-        }
-
-        [HttpGet("getSummaryForYear")]
-        public async Task<IActionResult> GetSummaryForYearAsync(string term, int year, CancellationToken cancellationToken)
-        {
-            var report = await _drugService.GetDrugReportAsClassAsync(term, cancellationToken);
-            var summary = report.GetSummary(year);
-            return Ok(summary);
-        }
+        }        
 
         [HttpPost("logTransaction")]
         public async Task<IActionResult> LogTransactionAsync([FromBody] string message, CancellationToken cancellationToken)
