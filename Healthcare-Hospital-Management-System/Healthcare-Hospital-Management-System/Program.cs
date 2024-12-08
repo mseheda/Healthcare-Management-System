@@ -47,7 +47,8 @@ builder.Services.AddSingleton<IDoctorService, DoctorService>();
 builder.Services.AddScoped<IDrugService, DrugService>();
 builder.Services.AddScoped<IDrugInventoryService, DrugInventoryService>();
 builder.Services.AddScoped<StaffNotificationService>();
-builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddSingleton<IDataProtectService, DataProtectService>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
 builder.Services.AddScoped<IHealthcareLogger, HealthcareLogger>();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -77,7 +78,7 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Configuration.AddUserSecrets<Program>();
 
 builder.Services.AddHttpClient();
-builder.Services.AddHttpClient<DrugClient>();
+builder.Services.AddHttpClient<IDrugClient, DrugClient>();
 
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();

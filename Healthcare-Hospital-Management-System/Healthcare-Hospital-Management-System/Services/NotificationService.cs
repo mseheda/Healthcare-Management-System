@@ -3,28 +3,39 @@ using System.Net.Mail;
 using System.Net;
 using Healthcare_Hospital_Management_System.Services;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography;
 
 namespace HealthcareHospitalManagementSystem.Services
 {
     public class NotificationService : INotificationService
     {
-        public async Task SendNotificationDoctorAsync(string message, CancellationToken cancellationToken)
-        {
-            string filePath = "transactions.log";
-            string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            string formattedMessage = $"{timestamp}: {message}";
-
-            using (StreamWriter writer = new StreamWriter(filePath, true))
-            {
-                await writer.WriteLineAsync(formattedMessage.AsMemory(), cancellationToken);
-            }
-        }
-
         private readonly IDrugService _drugService;
+        private readonly IDataProtectService _dataProtectService;
 
-        public NotificationService(IDrugService drugService)
+        public NotificationService(IDrugService drugService, IDataProtectService dataProtectService)
         {
             _drugService = drugService;
+            _dataProtectService = dataProtectService;
+        }
+
+        public async Task SendNotificationDoctorAsync(string message, CancellationToken cancellationToken)
+        {
+            try
+            {
+                string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                string timestampedMessage = $"{timestamp}: {message}";
+
+                string publicKey = _dataProtectService.ExportPublicKey();
+                byte[] encryptedMessage = await _dataProtectService.EncryptAsync(publicKey, timestampedMessage, cancellationToken);
+
+                string filePath = "transactions.log";
+                await File.WriteAllBytesAsync(filePath, encryptedMessage, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
         }
 
         public void StartListening()
@@ -52,5 +63,4 @@ namespace HealthcareHospitalManagementSystem.Services
             await File.AppendAllTextAsync(filePath, formattedMessage + Environment.NewLine);
         }
     }
-
 }

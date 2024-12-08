@@ -16,6 +16,11 @@ namespace Healthcare_Hospital_Management_System.Services
 
         public User GetUserByEmail(string email)
         {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email), "Email cannot be null or empty.");
+            }
+
             users.TryGetValue(email, out string? passwordHash);
 
             return new User

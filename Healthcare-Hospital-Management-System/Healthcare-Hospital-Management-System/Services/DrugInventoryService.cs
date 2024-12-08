@@ -10,7 +10,7 @@
 
         public DrugInventoryService()
         {
-            _drugStock = new Dictionary<string, int>();
+            _drugStock = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         }
 
         public async Task<int> GetStockLevelAsync(string drugName, CancellationToken cancellationToken)

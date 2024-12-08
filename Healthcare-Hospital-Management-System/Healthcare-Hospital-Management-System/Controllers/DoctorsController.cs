@@ -42,7 +42,7 @@ public class DoctorsController : ControllerBase
                 Department = department
             };
 
-            _doctorService.AddDoctor(doctor, (NotificationService)_notificationService);
+            _doctorService.AddDoctor(doctor, (INotificationService)_notificationService);
             return Ok();
         }
         catch (ObjectDisposedException)
