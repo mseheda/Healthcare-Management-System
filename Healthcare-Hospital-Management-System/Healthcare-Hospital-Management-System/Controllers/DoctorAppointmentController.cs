@@ -24,12 +24,14 @@ public class DoctorAppointmentController : ControllerBase
             return BadRequest("Invalid request.");
         }
 
-        var slotDateTime = request.SlotDate.ToDateTime(request.SlotTime);
+        var clientDateTime = request.SlotDate.ToDateTime(request.SlotTime);
+
+        var serverDateTime = TimeZoneHelper.ConvertClientTimeToServerTime(clientDateTime, request.ClientTimeZoneId);
 
         var success = _doctorService.AddTimeSlot(
             request.DoctorName,
             request.Specialization,
-            slotDateTime,
+            serverDateTime,
             TimeSpan.FromMinutes(request.DurationInMinutes));
 
         if (success)
@@ -41,18 +43,35 @@ public class DoctorAppointmentController : ControllerBase
     }
 
 
+
     [HttpGet("AvailableDoctors")]
     public ActionResult<List<Doctor>> GetAvailableDoctors(
-    [FromQuery] string specialization,
-    [FromQuery] DateTime date,
-    [FromQuery] TimeSpan? time = null)
+        [FromQuery] string specialization,
+        [FromQuery] DateTime date,
+        [FromQuery] TimeSpan? time = null,
+        [FromQuery] string clientTimeZoneId = "Eastern Standard Time")
     {
-        var doctors = _doctorService.GetAvailableDoctors(specialization, date, time);
+        DateTime clientDateTime;
+        if (time.HasValue)
+        {
+            clientDateTime = new DateTime(date.Year, date.Month, date.Day, time.Value.Hours, time.Value.Minutes, time.Value.Seconds);
+        }
+        else
+        {
+            clientDateTime = date;
+        }
+
+        var serverDateTime = TimeZoneHelper.ConvertClientTimeToServerTime(clientDateTime, clientTimeZoneId);
+
+        var doctors = _doctorService.GetAvailableDoctors(
+            specialization,
+            serverDateTime,
+            time.HasValue ? serverDateTime.TimeOfDay : (TimeSpan?)null);
 
         if (!doctors.Any())
         {
-            return NotFound($"No available doctors found for specialization {specialization} on {date:yyyy-MM-dd}" +
-                            (time.HasValue ? $" at {time}" : ""));
+            return NotFound($"No available doctors found for specialization {specialization} on {serverDateTime:yyyy-MM-dd}" +
+                            (time.HasValue ? $" at {serverDateTime:HH:mm}" : ""));
         }
 
         return Ok(doctors);
@@ -66,9 +85,11 @@ public class DoctorAppointmentController : ControllerBase
             return BadRequest("Invalid request.");
         }
 
-        var appointmentDateTime = request.AppointmentDate.ToDateTime(request.AppointmentTime);
+        var clientDateTime = request.AppointmentDate.ToDateTime(request.AppointmentTime);
 
-        if (_doctorService.ScheduleAppointment(request.DoctorName, request.Specialization, appointmentDateTime, request.DurationInMinutes))
+        var serverDateTime = TimeZoneHelper.ConvertClientTimeToServerTime(clientDateTime, request.ClientTimeZoneId);
+
+        if (_doctorService.ScheduleAppointment(request.DoctorName, request.Specialization, serverDateTime, request.DurationInMinutes))
         {
             return Ok("Appointment scheduled successfully.");
         }

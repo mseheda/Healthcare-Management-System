@@ -7,5 +7,6 @@
         public DateOnly AppointmentDate { get; set; }
         public TimeOnly AppointmentTime { get; set; }
         public int DurationInMinutes { get; set; }
+        public string ClientTimeZoneId { get; set; } = "Eastern Standard Time";
     }
 }
