@@ -8,14 +8,12 @@ namespace Healthcare_Hospital_Management_System.Services
     public class DrugService : IDrugService
     {
         private readonly IRepository<DrugReportClass> _drugReportRepository;
-        private readonly DrugClient _drugClient;
+        private readonly IDrugClient _drugClient;
 
-        public DrugService(IRepository<DrugReportClass> drugReportRepository, DrugClient drugClient)
+        public DrugService(IRepository<DrugReportClass> drugReportRepository, IDrugClient drugClient)
         {
-            _drugReportRepository = drugReportRepository
-                ?? throw new ArgumentNullException(nameof(drugReportRepository));
-            _drugClient = drugClient
-                ?? throw new ArgumentNullException(nameof(drugClient));
+            _drugReportRepository = drugReportRepository ?? throw new ArgumentNullException(nameof(drugReportRepository));
+            _drugClient = drugClient ?? throw new ArgumentNullException(nameof(drugClient));
         }
 
         public event EventHandler<DrugReportEventArgs> DrugReportAdded;
