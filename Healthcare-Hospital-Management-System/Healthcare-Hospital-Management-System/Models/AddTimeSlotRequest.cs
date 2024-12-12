@@ -7,5 +7,6 @@
         public DateOnly SlotDate { get; set; }
         public TimeOnly SlotTime { get; set; }
         public int DurationInMinutes { get; set; }
+        public string ClientTimeZoneId { get; set; } = "Eastern Standard Time";
     }
 }
