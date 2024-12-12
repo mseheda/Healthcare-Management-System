@@ -39,7 +39,11 @@ namespace Healthcare_Hospital_Management_System.Services
 
         public ClaimsPrincipal ValidateToken(string token)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler
+            {
+                MapInboundClaims = false
+            };
+
             var validationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
@@ -48,10 +52,12 @@ namespace Healthcare_Hospital_Management_System.Services
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = _jwtOptions.Issuer,
                 ValidAudience = _jwtOptions.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key)),
+                ClockSkew = TimeSpan.Zero
             };
 
             return tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
         }
+
     }
 }

@@ -1,4 +1,5 @@
 using Healthcare_Hospital_Management_System.Models;
+using Healthcare_Hospital_Management_System.Services;
 using HealthcareHospitalManagementSystem.Infrastructure;
 using HealthcareHospitalManagementSystem.Models;
 using HealthcareHospitalManagementSystem.Services;
@@ -8,14 +9,24 @@ public class DoctorService : IDoctorService
     private static List<Doctor> _doctors;
     private const int MaxDoctors = 50;
     public static int TotalDoctorsAdded { get; private set; } = 0;
-    public HealthcareLogger Logger { get; set; }
+    public IHealthcareLogger Logger { get; set; }
+    private readonly IDataProtectService _dataProtectService;
 
     static DoctorService()
     {
         _doctors = new List<Doctor>();
     }
 
-    public void AddDoctor(Doctor doctor, NotificationService? notificationService)
+    public DoctorService(IDataProtectService dataProtectService)
+    {
+        _dataProtectService = dataProtectService;
+    }
+
+    public DoctorService()
+    {
+    }
+
+    public void AddDoctor(Doctor doctor, INotificationService? notificationService)
     {
         if (doctor == null)
         {
@@ -49,6 +60,24 @@ public class DoctorService : IDoctorService
 
     public List<Doctor> GetDoctors()
     {
+        try
+        {
+            string encryptedFilePath = "transactions.log";
+            string plainTextFilePath = "listofdoctors.log";
+
+            if (File.Exists(encryptedFilePath))
+            {
+                byte[] encryptedData = File.ReadAllBytes(encryptedFilePath);
+                string decryptedContent = _dataProtectService.DecryptAsync(encryptedData, CancellationToken.None).Result;
+
+                File.WriteAllText(plainTextFilePath, decryptedContent);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger?.Log($"Error decrypting transactions log: {ex.Message}");
+        }
+
         return _doctors;
     }
 
