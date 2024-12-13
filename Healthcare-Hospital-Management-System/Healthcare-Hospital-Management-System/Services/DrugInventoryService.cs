@@ -6,7 +6,7 @@
 
         private const int LowStockThreshold = 10;
 
-        public event EventHandler<LowStockEventArgs> LowStockDetected;
+        public event EventHandler<LowStockEventArgs>? LowStockDetected;
 
         public DrugInventoryService()
         {
@@ -15,23 +15,30 @@
 
         public async Task<int> GetStockLevelAsync(string drugName, CancellationToken cancellationToken)
         {
-            if (_drugStock.TryGetValue(drugName, out var stockLevel))
+            return await Task.Run(() =>
             {
-                return stockLevel;
-            }
+                if (_drugStock.TryGetValue(drugName, out var stockLevel))
+                {
+                    return stockLevel;
+                }
 
-            return 0;
+                return 0;
+            }, cancellationToken);
         }
 
         public async Task UpdateStockLevelAsync(string drugName, int newStockLevel, CancellationToken cancellationToken)
         {
-            _drugStock[drugName] = newStockLevel;
-
-            if (newStockLevel < LowStockThreshold)
+            await Task.Run(() =>
             {
-                OnLowStockDetected(drugName, newStockLevel);
-            }
+                _drugStock[drugName] = newStockLevel;
+
+                if (newStockLevel < LowStockThreshold)
+                {
+                    OnLowStockDetected(drugName, newStockLevel);
+                }
+            }, cancellationToken);
         }
+
 
         protected virtual void OnLowStockDetected(string drugName, int stockLevel)
         {

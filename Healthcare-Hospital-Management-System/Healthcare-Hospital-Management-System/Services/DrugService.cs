@@ -16,7 +16,7 @@ namespace Healthcare_Hospital_Management_System.Services
             _drugClient = drugClient ?? throw new ArgumentNullException(nameof(drugClient));
         }
 
-        public event EventHandler<DrugReportEventArgs> DrugReportAdded;
+        public event EventHandler<DrugReportEventArgs>? DrugReportAdded;
 
         public async Task<TResult> ExecuteDrugReportOperationAsync<TResult>(string term1, string term2, IDrugService.DrugReportOperation<TResult> operation, CancellationToken cancellationToken)
         {

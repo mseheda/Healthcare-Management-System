@@ -4,8 +4,8 @@ namespace HealthcareHospitalManagementSystem.Models
 {
     public class Doctor : Person
     {
-        public string Specialization { get; set; }
-        public string Department { get; set; }
+        public required string Specialization { get; set; } 
+        public required string Department { get; set; }
         public List<TimeSlot> AvailableTimeSlots { get; set; } = new List<TimeSlot>();
 
         public override string DisplayInfo()
@@ -18,7 +18,7 @@ namespace HealthcareHospitalManagementSystem.Models
             return $"Doctor {Name} is working with patients.";
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is Doctor other)
             {

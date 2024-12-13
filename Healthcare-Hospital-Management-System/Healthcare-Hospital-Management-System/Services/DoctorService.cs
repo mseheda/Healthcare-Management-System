@@ -3,30 +3,28 @@ using Healthcare_Hospital_Management_System.Services;
 using HealthcareHospitalManagementSystem.Infrastructure;
 using HealthcareHospitalManagementSystem.Models;
 using HealthcareHospitalManagementSystem.Services;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 public class DoctorService : IDoctorService
 {
-    private static List<Doctor> _doctors;
+    private static readonly List<Doctor> _doctors = new();
     private const int MaxDoctors = 50;
-    public static int TotalDoctorsAdded { get; private set; } = 0;
-    public IHealthcareLogger Logger { get; set; }
-    private readonly IDataProtectService _dataProtectService;
 
-    static DoctorService()
-    {
-        _doctors = new List<Doctor>();
-    }
+    public static int TotalDoctorsAdded { get; private set; } = 0;
+    public IHealthcareLogger? Logger { get; set; }
+    private readonly IDataProtectService _dataProtectService;
 
     public DoctorService(IDataProtectService dataProtectService)
     {
-        _dataProtectService = dataProtectService;
+        _dataProtectService = dataProtectService ?? throw new ArgumentNullException(nameof(dataProtectService));
     }
 
-    public DoctorService()
-    {
-    }
-
-    public void AddDoctor(Doctor doctor, INotificationService? notificationService)
+    public void AddDoctor(Doctor doctor, INotificationService? notificationService = null)
     {
         if (doctor == null)
         {
@@ -88,12 +86,20 @@ public class DoctorService : IDoctorService
 
     public List<Doctor> GetAvailableDoctors(string specialization, DateTime date, TimeSpan? time = null)
     {
-        return _doctors.Where(d =>
-            d.Specialization.Equals(specialization, StringComparison.OrdinalIgnoreCase) &&
-            d.AvailableTimeSlots.Any(slot =>
-                slot.Date == DateOnly.FromDateTime(date) &&
-                (!time.HasValue || slot.StartTime == TimeOnly.FromTimeSpan(time.Value)))
-        ).ToList();
+        if (string.IsNullOrWhiteSpace(specialization))
+        {
+            throw new ArgumentException("Specialization cannot be null or empty.", nameof(specialization));
+        }
+
+        var searchCriteria = (specialization, DateOnly.FromDateTime(date), time.HasValue ? TimeOnly.FromTimeSpan(time.Value) : (TimeOnly?)null);
+
+        return _doctors
+            .Where(d =>
+                d.Specialization.Equals(searchCriteria.specialization, StringComparison.OrdinalIgnoreCase) &&
+                d.AvailableTimeSlots.Any(slot =>
+                    slot.Date == searchCriteria.Item2 &&
+                    (!searchCriteria.Item3.HasValue || slot.StartTime == searchCriteria.Item3)))
+            .ToList();
     }
 
     public bool ScheduleAppointment(string doctorName, string specialization, DateTime date, int durationInMinutes)
@@ -127,7 +133,6 @@ public class DoctorService : IDoctorService
         doctor.AvailableTimeSlots.Remove(matchingSlot);
         return true;
     }
-
 
     public bool AddTimeSlot(string doctorName, string specialization, DateTime date, TimeSpan time)
     {
