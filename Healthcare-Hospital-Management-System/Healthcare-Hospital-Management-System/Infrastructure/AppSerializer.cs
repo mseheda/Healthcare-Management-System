@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace HealthcareHospitalManagementSystem.Infrastructure
+namespace Healthcare_Hospital_Management_System.Infrastructure
 {
     public class AppSerializer
     {
