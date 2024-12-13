@@ -89,11 +89,42 @@ public class DoctorAppointmentController : ControllerBase
 
         var serverDateTime = TimeZoneHelper.ConvertClientTimeToServerTime(clientDateTime, request.ClientTimeZoneId);
 
+        string timeOfDay = ClassifyAppointmentTime(serverDateTime, request.IsHoliday, request.IsWeekend);
+
         if (_doctorService.ScheduleAppointment(request.DoctorName, request.Specialization, serverDateTime, request.DurationInMinutes))
         {
-            return Ok("Appointment scheduled successfully.");
+            return Ok($"Appointment scheduled successfully for the {timeOfDay}.");
         }
 
         return BadRequest("Failed to schedule appointment. The doctor may not be available at the specified date and time.");
     }
+
+    private string ClassifyAppointmentTime(DateTime dateTime, bool isHoliday, bool isWeekend)
+    {
+        if (isHoliday)
+        {
+            return "Holiday";
+        }
+
+        if (isWeekend)
+        {
+            return dateTime.Hour switch
+            {
+                >= 6 and < 12 => "Weekend Morning",
+                >= 12 and < 18 => "Weekend Afternoon",
+                >= 18 and <= 22 => "Weekend Evening",
+                _ => "Unavailable on Weekends"
+            };
+        }
+
+        return dateTime.Hour switch
+        {
+            >= 5 and < 12 => "Morning",
+            >= 12 and < 17 => "Afternoon",
+            >= 17 and < 21 => "Evening",
+            >= 21 and < 24 => "Late Night Emergency",
+            _ => "Unavailable"
+        };
+    }
+
 }

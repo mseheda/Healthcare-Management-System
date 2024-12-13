@@ -8,5 +8,7 @@
         public TimeOnly AppointmentTime { get; set; }
         public int DurationInMinutes { get; set; }
         public string ClientTimeZoneId { get; set; } = "Eastern Standard Time";
+        public bool IsHoliday { get; set; }
+        public bool IsWeekend { get; set; }
     }
 }
